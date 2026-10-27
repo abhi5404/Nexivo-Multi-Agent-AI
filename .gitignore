@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+serviceAccountKey*.json
+
+# Logs and runtime files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build and tool caches
+dist/
+build/
+coverage/
+.cache/
+.parcel-cache/
+.npm/
+
+# Local development
+.vscode/
+.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
