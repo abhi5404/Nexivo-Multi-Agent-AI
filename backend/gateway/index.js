@@ -1,7 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import proxy from "express-http-proxy";
 import cors from "cors";
+import protect from "./middleware/auth.middleware.js";
+import { getCurrentUser } from "./controllers/user.controller.js";
 
 
 dotenv.config();
@@ -14,9 +17,12 @@ app.use(cors({
 
 
 app.use(express.json());
-app.use("/auth", proxy(process.env.AUTH_SERVICE, {
-  proxyReqPathResolver: (req) => req.originalUrl
+app.use(cookieParser());
+app.use("/api/auth", proxy(process.env.AUTH_SERVICE, {
+  proxyReqPathResolver: (req) => req.originalUrl.replace(/^\/api/, "")
 }));
+
+app.get("/api/me", protect, getCurrentUser);
 
 app.get("/", (req, res) => {
   res.send("Gateway is running");
