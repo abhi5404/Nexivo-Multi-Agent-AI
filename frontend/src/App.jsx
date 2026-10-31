@@ -1,16 +1,20 @@
 import Home from "./pages/Home";
 import { useEffect } from "react";
-import api from "../utils/axios";
-import { auth, googleProvider } from "../utils/firebase";
 import getCurrentUser from "./features/getCurrentUser";
+import { useDispatch } from "react-redux";
+import { setUserdata } from "./redux/userSlice";
 
 function App() {
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    const getUser = async () => {
-      await getCurrentUser();
-}
-getUser();
-  }, []);
+    const loadCurrentUser = async () => {
+      const data = await getCurrentUser();
+      dispatch(setUserdata(data));
+    };
+
+    loadCurrentUser();
+  }, [dispatch]);
 
   return (
     <div className="App">
