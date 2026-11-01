@@ -58,9 +58,9 @@ export const saveMessage = async (req, res) => {
 
 export const getMessage = async (req, res) => {
     try {
-        const { conversationId } = req.body;
+      
         const message = await Message.find({
-            conversationId
+            conversationId : req.params.conversationId
         }).sort({ updatedAt: -1 });
         res.status(201).json(message);
     } catch (error) {
