@@ -1,9 +1,15 @@
 import { StateGraph } from "@langchain/langgraph"
 import { agentState } from "./state.js"
 import { router } from "./router.js"
+import { chatAgent } from "../agents/chat.agent.js"
+import { searchAgent } from "../agents/search.agent.js"
+import { codingAgent } from "../agents/coding.agent.js"
+import { imageAgent } from "../agents/imageGen.agent.js"
+import { pdfAgent } from "../agents/pdf.agent.js"
+import { pptAgent } from "../agents/ppt.agent.js"
 
 
-// Agents 
+// Create a new state graph with the agentState as the root state
 const workflow = new StateGraph(agentState)
 
 // Add nodes to the workflow
