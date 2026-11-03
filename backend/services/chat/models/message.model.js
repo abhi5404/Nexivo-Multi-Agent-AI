@@ -12,5 +12,5 @@ const conversationSchema = new mongoose.Schema({
     content: String
 }, { timestamps: true });
 
-const Conversation = mongoose.model("Conversation", conversationSchema);
-export default Conversation;
+const Message = mongoose.model("Message", conversationSchema);
+export default Message;

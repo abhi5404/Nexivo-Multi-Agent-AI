@@ -19,9 +19,11 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
-app.use("/api/agent", protect, proxyWithHeader(process.env.AGENT_SERVICE));
-app.use("/api/auth",protect, proxy(process.env.AUTH_SERVICE));
-app.use("/api/chat", protect, proxyWithHeader(process.env.CHAT_SERVICE));
+app.use("/api/agent", protect, proxyWithHeader(process.env.AGENT_SERVICE, "/api/agent"));
+app.use("/api/auth", proxy(process.env.AUTH_SERVICE, {
+  proxyReqPathResolver: (req) => req.originalUrl.replace(/^\/api\/auth/, "/auth"),
+}));
+app.use("/api/chat", protect, proxyWithHeader(process.env.CHAT_SERVICE, "/api/chat"));
 
 app.get("/api/me", protect, getCurrentUser);
 

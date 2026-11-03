@@ -68,3 +68,5 @@ export const getMessage = async (req, res) => {
         res.status(500).json({ message: "Error fetching message" });
     }
 };
+import Conversation from "../models/conversation.model.js";
+import Message from "../models/message.model.js";
