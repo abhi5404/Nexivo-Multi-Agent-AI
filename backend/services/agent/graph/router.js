@@ -1,6 +1,6 @@
 
 
-export const router = (params) => {
+export const router = async (params) => {
    const llm = getModels("router")
    const prompt = `You are a router agent. Your task is to determine
     the appropriate agent for a given user prompt. The available agents are: chat, search, 
@@ -19,7 +19,10 @@ export const router = (params) => {
 User Query :
 ${state.prompt}`
 
-await llm.invoke(prompt).then((response) => {
-    state.agent = response.output_text.trim()
-    console.log("Router Agent selected:", state.agent)
-})
+const response = await llm.invoke(prompt)
+console.log(response)
+return{
+    ...state,
+    agent:response.content.trim().toLowerCase()
+}
+}
