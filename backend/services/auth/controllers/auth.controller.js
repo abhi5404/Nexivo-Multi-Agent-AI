@@ -19,6 +19,9 @@ export const login = async (req, res) => {
         email: decoded.email,
         avatar: decoded.picture
     })
+   } else if (decoded.picture && user.avatar !== decoded.picture) {
+    user.avatar = decoded.picture;
+    await user.save();
    }
    const sessionId = crypto.randomUUID();
 
@@ -48,9 +51,18 @@ return res.status(200).json({ message: 'Login successful', user });
 
 export const logout = async (req, res) => {
     try {
-        const sessionId = req.cookies.sessionId;
-        await redis.del(`session-${sessionId}`);
-        res.clearCookie('sessionId');
+        const sessionId = req.cookies?.sessionId;
+
+        if (sessionId) {
+            await redis.del(`session-${sessionId}`);
+        }
+
+        res.clearCookie('sessionId', {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: '/'
+        });
         return res.status(200).json({ message: 'Logout successful' });
     } catch (error) {
         return res.status(500).json({ message: 'Logout failed', error: error.message });

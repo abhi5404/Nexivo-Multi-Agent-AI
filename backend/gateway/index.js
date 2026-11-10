@@ -6,6 +6,7 @@ import cors from "cors";
 import protect from "./middleware/auth.middleware.js";
 import { getCurrentUser } from "./controllers/user.controller.js";
 import { proxyWithHeader } from "./utils/proxyWithHeader.js";
+import redis from "../shared/redis/redis.js";
 
 
 dotenv.config();
@@ -20,6 +21,27 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/agent", protect, proxyWithHeader(process.env.AGENT_SERVICE, "/api/agent"));
+app.post("/api/auth/logout", async (req, res) => {
+  try {
+    const sessionId = req.cookies?.sessionId;
+
+    if (sessionId) {
+      await redis.del(`session-${sessionId}`);
+    }
+
+    res.clearCookie("sessionId", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      path: "/",
+    });
+
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error("Logout failed:", error.message);
+    return res.status(500).json({ message: "Logout failed" });
+  }
+});
 app.use("/api/auth", proxy(process.env.AUTH_SERVICE, {
   proxyReqPathResolver: (req) => req.originalUrl.replace(/^\/api\/auth/, "/auth"),
 }));

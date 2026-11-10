@@ -1,3 +1,57 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .sidebar-rail {
+    @apply flex h-screen w-[56px] shrink-0 flex-col items-center border-r border-white/[0.06] bg-[#0d0f14] px-2 py-4;
+  }
+
+  .sidebar-icon-button {
+    @apply flex h-9 w-9 items-center justify-center rounded-xl border-0 bg-transparent text-slate-500 transition-all duration-150;
+  }
+
+  .sidebar-icon-button:hover {
+    @apply bg-white/[0.05] text-slate-200;
+  }
+
+  .sidebar-new-chat {
+    @apply mt-2;
+  }
+
+  .sidebar-new-chat:hover {
+    @apply bg-indigo-500/10 text-indigo-300;
+  }
+
+  .sidebar-conversations {
+    @apply mt-3 flex w-full flex-1 flex-col items-center gap-1.5 border-t border-white/[0.06] pt-3;
+  }
+
+  .sidebar-conversation-icon {
+    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all duration-150;
+  }
+
+  .sidebar-conversation-icon:hover {
+    @apply bg-white/[0.05] text-slate-300;
+  }
+
+  .sidebar-conversation-icon.is-active {
+    @apply border-indigo-400/20 bg-indigo-500/15 text-indigo-300 shadow-[0_0_16px_rgba(99,102,241,0.12)];
+  }
+
+  .sidebar-account {
+    @apply mt-auto flex w-full flex-col items-center gap-2 border-t border-white/[0.06] pt-3;
+  }
+
+  .sidebar-avatar {
+    @apply h-9 w-9 rounded-full object-cover ring-1 ring-white/10;
+  }
+
+  .sidebar-avatar-fallback {
+    @apply flex items-center justify-center bg-indigo-500/20 text-indigo-300;
+  }
+
+  .sidebar-logout:hover {
+    @apply bg-red-400/10 text-red-300;
+  }
+}

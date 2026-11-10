@@ -1,9 +1,9 @@
-import { graph } from "../graph.js";
 import axios from "axios";
 
 export const agent = async (req, res) => {
     try {
         const { prompt, conversationId } = req.body;
+        const { graph } = await import("../../graph/graph.js");
         await axios.post(`${process.env.CHAT_SERVICE}/save-message`, {
             conversationId , role: "user", content: prompt
         })

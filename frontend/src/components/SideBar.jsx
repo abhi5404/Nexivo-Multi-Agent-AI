@@ -1,4 +1,13 @@
-import { MessageSquare, PanelLeft, PenSquare, Plus } from "lucide-react";
+import {
+  LogIn,
+  LogOut,
+  MessageSquare,
+  PanelLeft,
+  PanelRight,
+  PenSquare,
+  Plus,
+  UserRound,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { createConversation } from "../features/createConversation";
@@ -7,13 +16,24 @@ import {
   selectConversation,
   setConversations,
 } from "../redux/conversationSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getConversations } from "../features/getConversations";
+import { auth } from "../../utils/firebase";
 
-function SideBar() {
+function SideBar({ onLogin, onLogout }) {
   const dispatch = useDispatch();
-  const { conversations , selectedConversation } = useSelector((state) => state.conversation);
+  const { conversations, selectedConversation } = useSelector(
+    (state) => state.conversation,
+  );
   const { user } = useSelector((state) => state.user);
+  const avatarUrl =
+    user?.avatar ||
+    user?.photoURL ||
+    user?.picture ||
+    auth.currentUser?.photoURL;
+  const plan = user?.plan || "free";
+  const [imageErrorUrl, setImageErrorUrl] = useState(null);
+  const [collapsed, setCollapsed] = useState(true);
 
   const handleCreateConversation = async () => {
     const data = await createConversation();
@@ -38,18 +58,111 @@ function SideBar() {
       loadConversations();
     }, [dispatch, user]);
 
+  if (collapsed) {
+    return (
+      <aside className="sidebar-rail">
+        <button
+          type="button"
+          title="Expand sidebar"
+          aria-label="Expand sidebar"
+          onClick={() => setCollapsed(false)}
+          className="sidebar-icon-button"
+        >
+          <PanelRight size={16} />
+        </button>
+        <button
+          type="button"
+          title="New chat"
+          aria-label="New chat"
+          onClick={handleCreateConversation}
+          className="sidebar-icon-button sidebar-new-chat"
+        >
+          <Plus size={17} />
+        </button>
+        <div className="sidebar-conversations">
+          {conversations.map((conversation) => {
+            const isActive = selectedConversation?._id === conversation?._id;
+
+            return (
+              <button
+                key={conversation._id}
+                type="button"
+                title={conversation.title || "New Chat"}
+                aria-label={conversation.title || "New Chat"}
+                onClick={() => dispatch(selectConversation(conversation))}
+                className={`sidebar-conversation-icon ${
+                  isActive
+                    ? "is-active"
+                    : ""
+                }`}
+              >
+                <MessageSquare size={14} strokeWidth={1.7} />
+              </button>
+            );
+          })}
+        </div>
+        <div className="sidebar-account">
+          {user ? (
+            <>
+              {avatarUrl && imageErrorUrl !== avatarUrl ? (
+                <img
+                  key={avatarUrl}
+                  src={avatarUrl}
+                  alt={user.name || "User"}
+                  title={user.name || "User"}
+                  referrerPolicy="no-referrer"
+                  className="sidebar-avatar"
+                  onError={() => setImageErrorUrl(avatarUrl)}
+                />
+              ) : (
+                <div
+                  title={user.name || "User"}
+                  className="sidebar-avatar sidebar-avatar-fallback"
+                >
+                  <UserRound size={17} strokeWidth={1.8} />
+                </div>
+              )}
+              <button
+                type="button"
+                title="Logout"
+                aria-label="Logout"
+                onClick={onLogout}
+                className="sidebar-icon-button sidebar-logout"
+              >
+                <LogOut size={15} strokeWidth={1.8} />
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              title="Login"
+              aria-label="Login"
+              onClick={onLogin}
+              className="sidebar-icon-button"
+            >
+              <LogIn size={16} strokeWidth={1.8} />
+            </button>
+          )}
+        </div>
+      </aside>
+    );
+  }
+
   return (
-    <div className="fixed lg:static inset-y-0 left-0 z-50 w-[270px] h-screen shrink-0 bg-[#0d0f14] border-r border-white/[0.06]">
+    <aside className="fixed inset-y-0 left-0 z-50 h-screen w-[270px] shrink-0 border-r border-white/[0.06] bg-[#0d0f14] lg:static">
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2.5 px-4 py-4 border-b border-white/[0.06]">
-          <div className="hidden lg:flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer">
-            <PanelLeftIcon />
-          </div>
+          <button
+            type="button"
+            title="Collapse sidebar"
+            aria-label="Collapse sidebar"
+            onClick={() => setCollapsed(true)}
+            className="hidden h-7 w-7 items-center justify-center rounded-lg border-none bg-transparent text-slate-500 transition-colors duration-150 hover:bg-white/[0.05] hover:text-slate-200 lg:flex"
+          >
+            <PanelLeft size={16} />
+          </button>
           <span className="text-[16px] font-semibold text-slate-100 tracking-tight flex-1">
             Nexivo
-          </span>
-          <span className="text-[10px] font-medium text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full tracking-wide">
-            free
           </span>
           <button className="flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer">
             <PenSquare size={14} />
@@ -119,34 +232,58 @@ function SideBar() {
             </>
           )}
         </div>
-        {user && (
-          <div className="flex items-center gap-3 border-t border-white/[0.06] px-4 py-3">
-            {user.avatar ? (
-              <img
-                src={user.avatar}
-                alt={user.name || "User"}
-                className="h-8 w-8 rounded-full object-cover"
-              />
-            ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/20 text-xs font-semibold text-indigo-300">
-                {(user.name || user.email || "U").charAt(0).toUpperCase()}
+        <div className="border-t border-white/[0.06] px-4 py-3">
+          {user ? (
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                {avatarUrl && imageErrorUrl !== avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={user.name || "User"}
+                    className="h-8 w-8 rounded-full object-cover"
+                    onError={() => setImageErrorUrl(avatarUrl)}
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-300">
+                    <UserRound size={17} strokeWidth={1.8} />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-slate-200">
+                    {user.name || "User"}
+                  </p>
+                  <p className="truncate text-xs text-slate-500">{user.email}</p>
+                </div>
               </div>
-            )}
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-slate-200">
-                {user.name || "User"}
-              </p>
-              <p className="truncate text-xs text-slate-500">{user.email}</p>
+              <span className="shrink-0 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium capitalize tracking-wide text-indigo-300">
+                {plan}
+              </span>
+              <button
+                type="button"
+                title="Logout"
+                aria-label="Logout"
+                onClick={onLogout}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/[0.05] hover:text-red-300"
+              >
+                <LogOut size={15} strokeWidth={1.8} />
+              </button>
             </div>
-          </div>
-        )}
+          ) : (
+            <button
+              type="button"
+              onClick={onLogin}
+              className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm font-medium text-slate-300 transition-colors hover:bg-white/[0.05] hover:text-slate-100"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-300">
+                <LogIn size={16} strokeWidth={1.8} />
+              </span>
+              <span>Login</span>
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </aside>
   );
-}
-
-function PanelLeftIcon() {
-  return <PanelLeft size={16} />;
 }
 
 export default SideBar;
