@@ -5,31 +5,47 @@ import { useDispatch } from "react-redux";
 import { setUserdata } from "./redux/userSlice";
 import { auth } from "../utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import api from "../utils/axios";
 
 function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
     const loadCurrentUser = async (firebaseUser) => {
-      const data = await getCurrentUser();
-      const profile = data || firebaseUser;
+      if (!firebaseUser) {
+        dispatch(setUserdata(null));
+        return;
+      }
+
+      let profile = await getCurrentUser();
+
+      if (!profile) {
+        const token = await firebaseUser.getIdToken();
+        await api.post("/api/auth/login", { token });
+        profile = await getCurrentUser();
+      }
 
       dispatch(
         setUserdata(
           profile
             ? {
                 ...profile,
-                name: data?.name || firebaseUser?.displayName,
-                email: data?.email || firebaseUser?.email,
-                avatar: data?.avatar || firebaseUser?.photoURL,
-                photoURL: data?.photoURL || firebaseUser?.photoURL,
+                name: profile.name || firebaseUser.displayName,
+                email: profile.email || firebaseUser.email,
+                avatar: profile.avatar || firebaseUser.photoURL,
+                photoURL: profile.avatar || firebaseUser.photoURL,
               }
             : null,
         ),
       );
     };
 
-    const unsubscribe = onAuthStateChanged(auth, loadCurrentUser);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      loadCurrentUser(firebaseUser).catch((error) => {
+        console.error("Failed to restore authentication session:", error);
+        dispatch(setUserdata(null));
+      });
+    });
 
     return unsubscribe;
   }, [dispatch]);

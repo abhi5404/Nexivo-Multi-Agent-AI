@@ -7,6 +7,7 @@ import protect from "./middleware/auth.middleware.js";
 import { getCurrentUser } from "./controllers/user.controller.js";
 import { proxyWithHeader } from "./utils/proxyWithHeader.js";
 import redis from "../shared/redis/redis.js";
+import morgan from "morgan";
 
 
 dotenv.config();
@@ -17,7 +18,7 @@ app.use(cors({
   credentials: true
 }));
 
-
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/agent", protect, proxyWithHeader(process.env.AGENT_SERVICE, "/api/agent"));
