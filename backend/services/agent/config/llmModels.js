@@ -16,7 +16,7 @@ const google = new ChatGoogleGenerativeAI({
     // other params...
 })
 
-export const getModels = async () => {
+export const getModels = async (agent) => {
     switch (agent) {
         case "chat":
             return groq

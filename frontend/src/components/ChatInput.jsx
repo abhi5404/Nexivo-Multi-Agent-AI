@@ -1,7 +1,12 @@
-import { Paperclip, Send } from "lucide-react";
+import { Mic, Paperclip, Send } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import api from "../../utils/axios";
+import { createConversation } from "../features/createConversation";
+import sendMessage from "../features/sendMessage";
+import {
+  addConversation,
+  selectConversation,
+} from "../redux/conversationSlice";
 import { addMessage } from "../redux/messageSlice";
 
 function ChatInput() {
@@ -12,20 +17,29 @@ function ChatInput() {
   const [prompt, setPrompt] = useState("");
   const [isSending, setIsSending] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSendMessage = async (event) => {
+    event?.preventDefault();
     const content = prompt.trim();
-    if (!content || !selectedConversation?._id || isSending) return;
+    if (!content || isSending) return;
 
     setIsSending(true);
-    setPrompt("");
-    dispatch(addMessage({ role: "user", content }));
 
     try {
-      const { data } = await api.post("/api/agent/chat", {
+      let conversation = selectedConversation;
+      if (!conversation?._id) {
+        conversation = await createConversation();
+        dispatch(addConversation(conversation));
+        dispatch(selectConversation(conversation));
+      }
+
+      setPrompt("");
+      dispatch(addMessage({ role: "user", content }));
+
+      const data = await sendMessage({
         prompt: content,
-        conversationId: selectedConversation._id,
+        conversationId: conversation._id,
       });
+      console.log("AI response:", data?.response);
       if (data?.response) {
         dispatch(addMessage({ role: "assistant", content: data.response }));
       }
@@ -38,26 +52,42 @@ function ChatInput() {
   };
 
   return (
-    <div className="chat-composer-wrap">
-      <form className="chat-composer" onSubmit={handleSubmit}>
-        <button type="button" className="chat-composer-button" title="Attach file">
-          <Paperclip size={17} strokeWidth={1.8} />
+    <div className="w-full border-t border-white/[0.06] bg-[#0d0f14] px-4 pb-4 pt-3 md:px-6">
+      <form
+        className="mx-auto flex max-w-3xl items-center gap-2 rounded-2xl border border-white/[0.1] bg-[#171a21] px-3 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.16)] transition-colors focus-within:border-indigo-400/30"
+        onSubmit={handleSendMessage}
+      >
+        <button
+          type="button"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-600 transition-all duration-150 hover:border-white/[0.06] hover:bg-white/[0.05] hover:text-slate-300"
+          title="Attach file"
+          aria-label="Attach file"
+        >
+          <Paperclip size={16} strokeWidth={1.8} />
+        </button>
+        <button
+          type="button"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-600 transition-all duration-150 hover:border-white/[0.06] hover:bg-white/[0.05] hover:text-slate-300"
+          title="Voice input"
+          aria-label="Voice input"
+        >
+          <Mic size={16} strokeWidth={1.8} />
         </button>
         <input
           value={prompt}
           onChange={(event) => setPrompt(event.target.value)}
-          disabled={!selectedConversation || isSending}
-          placeholder={
-            selectedConversation ? "Message Nexivo..." : "Select or create a chat"
-          }
+          disabled={isSending}
+          placeholder="Ask anything..."
           aria-label="Message"
-          className="chat-composer-input"
+          className="min-w-0 flex-1 border-0 bg-transparent px-1 text-sm text-slate-200 outline-none placeholder:text-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
         />
         <button
-          type="submit"
-          disabled={!prompt.trim() || !selectedConversation || isSending}
-          className="chat-send-button"
+          type="button"
+          onClick={handleSendMessage}
+          disabled={!prompt.trim() || isSending}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border-0 bg-indigo-500 text-white transition-colors duration-150 hover:bg-indigo-400 disabled:cursor-not-allowed disabled:bg-white/[0.06] disabled:text-slate-600"
           title="Send message"
+          aria-label="Send message"
         >
           <Send size={16} strokeWidth={2} />
         </button>

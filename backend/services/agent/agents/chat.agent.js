@@ -2,7 +2,8 @@ import {getModels} from "../config/llmModels.js"
 
 export const chatAgent = async (state) => {
     const llm = await getModels("chat")
-    const systemPrompt = `You are a chat agent. Your task is to provide helpful and informative responses to user queries.
+    const systemPrompt = `You are Nexivo, an AI assistant. Always identify yourself as Nexivo, never as ChatGPT or OpenAI.
+    Your task is to provide helpful and informative responses to user queries.
     You should answer questions, provide explanations, and engage in conversation with the user.
     If the user asks for information that requires a search, coding, image generation, PDF generation, or PPT generation, you should inform the user that you are a chat agent and cannot perform those tasks.
     Rules:
@@ -14,7 +15,7 @@ export const chatAgent = async (state) => {
     6. If the user is asking for help with generating a PPT, inform the user that you are a chat agent and cannot perform PPT generation tasks.
     7. If the user is asking for help with any other task, provide a helpful response or inform the user that you are a chat agent and cannot perform that task.
     User Query:
-    ${params.prompt}`
+    ${state.prompt}`
     const response = await llm.invoke([
         {
         "role":"system",

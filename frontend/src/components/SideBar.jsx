@@ -38,6 +38,7 @@ function SideBar({ onLogin, onLogout }) {
   const handleCreateConversation = async () => {
     const data = await createConversation();
     dispatch(addConversation(data));
+    dispatch(selectConversation(data));
   };
 
     useEffect(() => {
