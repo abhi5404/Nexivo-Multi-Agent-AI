@@ -1,9 +1,14 @@
 
+import Conversation from "../models/conversation.model.js";
+import Message from "../models/message.model.js";
 
 export const createConversation = async (req, res) => {
     try {
         const userId = req.headers["x-user-id"];
         console.log("User ID from header:", userId);
+        if (!userId) {
+            return res.status(400).json({ message: "Missing user ID" });
+        }
         const conversation = await Conversation.create({
             userId : userId 
         });
@@ -18,10 +23,13 @@ export const getConversation = async (req, res) => {
     try {
         const userId = req.headers["x-user-id"];
         console.log("User ID from header:", userId);
+        if (!userId) {
+            return res.status(400).json({ message: "Missing user ID" });
+        }
         const conversation = await Conversation.find({
             userId : userId 
         }).sort({ updatedAt: -1 });
-        res.status(201).json(conversation);
+        res.status(200).json(conversation);
     } catch (error) {
         console.error("Error fetching conversation:", error);
         res.status(500).json({ message: "Error fetching conversation" });
@@ -42,6 +50,9 @@ export const updateConversation = async (req, res) => {
 export const saveMessage = async (req, res) => {
     try {
         const { conversationId , role, content } = req.body;
+        if (!conversationId || !role || typeof content !== "string") {
+            return res.status(400).json({ message: "conversationId, role and content are required" });
+        }
         const message = await Message.create({
             conversationId,
             role,
@@ -62,11 +73,9 @@ export const getMessage = async (req, res) => {
         const message = await Message.find({
             conversationId : req.params.conversationId
         }).sort({ createdAt: 1 });
-        res.status(201).json(message);
+        res.status(200).json(message);
     } catch (error) {
         console.error("Error fetching message:", error);
         res.status(500).json({ message: "Error fetching message" });
     }
 };
-import Conversation from "../models/conversation.model.js";
-import Message from "../models/message.model.js";

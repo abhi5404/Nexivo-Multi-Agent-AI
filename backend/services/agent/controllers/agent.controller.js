@@ -1,9 +1,14 @@
 import axios from "axios";
+import { addMessage } from "../config/memory.js";
 
 export const agent = async (req, res) => {
     try {
         const { prompt, conversationId } = req.body;
-        const { graph } = await import("../../graph/graph.js");
+        if (!prompt?.trim() || !conversationId) {
+            return res.status(400).json({ message: "prompt and conversationId are required" });
+        }
+        await addMessage(conversationId, "user", prompt);
+        const { graph } = await import("../graph/graph.js");
         await axios.post(`${process.env.CHAT_SERVICE}/save-message`, {
             conversationId , role: "user", content: prompt
         })
@@ -12,6 +17,7 @@ export const agent = async (req, res) => {
             conversationId
         })
         const response = result.aiResponse
+        await addMessage(conversationId, "assistant", response);
         await axios.post(`${process.env.CHAT_SERVICE}/save-message`, {
             conversationId,
             role: "assistant",

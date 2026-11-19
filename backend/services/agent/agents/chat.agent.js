@@ -1,7 +1,10 @@
-import {getModels} from "../config/llmModels.js"
+import { getModels } from "../config/llmModels.js";
+import { getMemory } from "../config/memory.js";
+import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 
 export const chatAgent = async (state) => {
     const llm = await getModels("chat")
+    const history = await getMemory(state.conversationId)
     const systemPrompt = `You are Nexivo, an AI assistant. Always identify yourself as Nexivo, never as ChatGPT or OpenAI.
 Your task is to provide helpful and informative responses to user queries.
 If the user asks for information that requires a search, coding, image generation, PDF generation, or PPT generation, explain briefly that you are the chat agent and cannot perform that task.
@@ -23,16 +26,30 @@ Response rules:
 
 User Query:
 ${state.prompt}`
-    const response = await llm.invoke([
-        {
-        "role":"system",
-        "content": systemPrompt
-    },
-    {
-        "role" : "human",
-        "content" : state.prompt
+    
+const messages = [
+    new SystemMessage(systemPrompt) 
+]
+history.forEach(msg => {
+    if(msg.role === "user") {
+        messages.push(new HumanMessage(msg.content))
+    } else if(msg.role === "assistant") {
+        messages.push(new AIMessage(msg.content))
     }
-])
+})
+
+const latestHistoryMessage = history.at(-1);
+if (
+    !latestHistoryMessage ||
+    latestHistoryMessage.role !== "user" ||
+    latestHistoryMessage.content !== state.prompt
+) {
+    messages.push(new HumanMessage(state.prompt));
+}
+
+console.log(messages)
+
+    const response = await llm.invoke(messages)
 return {
     ...state,
     aiResponse: response.content.trim()

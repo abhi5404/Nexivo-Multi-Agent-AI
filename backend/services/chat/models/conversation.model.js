@@ -6,9 +6,11 @@ const conversationSchema = new mongoose.Schema({
         type: String,
         default: "New Conversation"
     },
-    userId: [{
-        type: String
-    }],
+    userId: {
+        type: String,
+        required: true,
+        index: true,
+    },
 }, { timestamps: true });
 
 const Conversation = mongoose.model("Conversation", conversationSchema);
