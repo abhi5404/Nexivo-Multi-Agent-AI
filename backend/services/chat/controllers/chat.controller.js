@@ -61,7 +61,7 @@ export const getMessage = async (req, res) => {
       
         const message = await Message.find({
             conversationId : req.params.conversationId
-        }).sort({ updatedAt: -1 });
+        }).sort({ createdAt: 1 });
         res.status(201).json(message);
     } catch (error) {
         console.error("Error fetching message:", error);

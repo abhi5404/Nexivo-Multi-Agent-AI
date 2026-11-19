@@ -79,6 +79,93 @@
     @apply bg-white/[0.08] text-slate-400;
   }
 
+  .chat-markdown {
+    @apply min-w-0;
+  }
+
+  .chat-markdown > :first-child {
+    @apply mt-0;
+  }
+
+  .chat-markdown > :last-child {
+    @apply mb-0;
+  }
+
+  .chat-markdown p {
+    @apply my-2;
+  }
+
+  .chat-markdown h1,
+  .chat-markdown h2,
+  .chat-markdown h3 {
+    @apply mb-2 mt-4 font-semibold text-slate-100;
+  }
+
+  .chat-markdown h1 {
+    @apply text-lg;
+  }
+
+  .chat-markdown h2 {
+    @apply text-base;
+  }
+
+  .chat-markdown h3 {
+    @apply text-sm;
+  }
+
+  .chat-markdown ul {
+    @apply my-2 list-disc space-y-1 pl-5;
+  }
+
+  .chat-markdown ol {
+    @apply my-2 list-decimal space-y-1 pl-5;
+  }
+
+  .chat-markdown li {
+    @apply pl-1;
+  }
+
+  .chat-markdown input[type="checkbox"] {
+    @apply mr-2 accent-indigo-400;
+  }
+
+  .chat-markdown a {
+    @apply text-indigo-300 underline decoration-indigo-400/40 underline-offset-2 hover:text-indigo-200;
+  }
+
+  .chat-markdown blockquote {
+    @apply my-3 border-l-2 border-indigo-400/40 pl-3 text-slate-400;
+  }
+
+  .chat-markdown code {
+    @apply rounded bg-black/20 px-1.5 py-0.5 font-mono text-[0.85em] text-indigo-200;
+  }
+
+  .chat-markdown pre {
+    @apply my-3 overflow-x-auto rounded-lg border border-white/[0.08] bg-[#0d0f14] p-3;
+  }
+
+  .chat-markdown pre code {
+    @apply bg-transparent p-0 text-[0.8rem] text-slate-200;
+  }
+
+  .chat-markdown table {
+    @apply my-3 block max-w-full overflow-x-auto border-collapse text-left text-xs;
+  }
+
+  .chat-markdown th,
+  .chat-markdown td {
+    @apply border border-white/[0.1] px-3 py-2;
+  }
+
+  .chat-markdown th {
+    @apply bg-white/[0.05] font-semibold text-slate-100;
+  }
+
+  .chat-markdown hr {
+    @apply my-4 border-white/[0.1];
+  }
+
   .chat-composer-wrap {
     @apply shrink-0 border-t border-white/[0.06] px-5 pb-4 pt-4;
   }

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import getMessages from "../features/getMessages";
 import { setMessages } from "../redux/messageSlice";
@@ -11,19 +11,48 @@ function ChatArea() {
   const selectedConversation = useSelector(
     (state) => state.conversation.selectedConversation,
   );
+  const messages = useSelector((state) => state.message.messages);
+  const messagesRef = useRef(messages);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   useEffect(() => {
     let active = true;
+    const conversationId = selectedConversation?._id;
 
     const loadMessages = async () => {
-      if (!selectedConversation?._id) {
+      if (!conversationId) {
         dispatch(setMessages([]));
         return;
       }
 
-      const messages = await getMessages(selectedConversation._id);
+      dispatch(setMessages([]));
+      const loadedMessages = await getMessages(conversationId);
       if (active) {
-        dispatch(setMessages(messages));
+        const localMessages = messagesRef.current.filter(
+          (message) => message.conversationId === conversationId,
+        );
+        const mergedMessages = [...loadedMessages];
+
+        for (const localMessage of localMessages) {
+          const alreadyLoaded = mergedMessages.some(
+            (message) =>
+              message._id === localMessage._id ||
+              (message.role === localMessage.role &&
+                message.content === localMessage.content),
+          );
+          if (!alreadyLoaded) {
+            mergedMessages.push(localMessage);
+          }
+        }
+
+        mergedMessages.sort(
+          (left, right) =>
+            new Date(left.createdAt || 0) - new Date(right.createdAt || 0),
+        );
+        dispatch(setMessages(mergedMessages));
       }
     };
 

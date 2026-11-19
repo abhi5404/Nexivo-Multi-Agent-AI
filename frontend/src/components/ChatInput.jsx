@@ -33,7 +33,13 @@ function ChatInput() {
       }
 
       setPrompt("");
-      dispatch(addMessage({ role: "user", content }));
+      dispatch(
+        addMessage({
+          conversationId: conversation._id,
+          role: "user",
+          content,
+        }),
+      );
 
       const data = await sendMessage({
         prompt: content,
@@ -41,7 +47,13 @@ function ChatInput() {
       });
       console.log("AI response:", data?.response);
       if (data?.response) {
-        dispatch(addMessage({ role: "assistant", content: data.response }));
+        dispatch(
+          addMessage({
+            conversationId: conversation._id,
+            role: "assistant",
+            content: data.response,
+          }),
+        );
       }
     } catch (error) {
       console.error("Failed to send message:", error);
