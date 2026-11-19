@@ -4,7 +4,9 @@ const conversationSchema = new mongoose.Schema({
      title: 
     {
         type: String,
-        default: "New Conversation"
+         default: "New Conversation",
+         trim: true,
+         maxlength: 48,
     },
     userId: {
         type: String,

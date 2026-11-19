@@ -6,7 +6,9 @@ import sendMessage from "../features/sendMessage";
 import {
   addConversation,
   selectConversation,
+  setConvTitle,
 } from "../redux/conversationSlice";
+import { updateConversation } from "../features/updateConversations";
 import { addMessage } from "../redux/messageSlice";
 
 function ChatInput() {
@@ -16,6 +18,12 @@ function ChatInput() {
   );
   const [prompt, setPrompt] = useState("");
   const [isSending, setIsSending] = useState(false);
+
+  const getConversationTitle = (text) => {
+    const normalized = text.replace(/\s+/g, " ").trim();
+    if (normalized.length <= 48) return normalized;
+    return `${normalized.slice(0, 45).trimEnd()}...`;
+  };
 
   const handleSendMessage = async (event) => {
     event?.preventDefault();
@@ -30,6 +38,31 @@ function ChatInput() {
         conversation = await createConversation();
         dispatch(addConversation(conversation));
         dispatch(selectConversation(conversation));
+      }
+
+      if (
+        !conversation.title ||
+        conversation.title === "New Conversation" ||
+        conversation.title === "New Chat"
+      ) {
+        const title = getConversationTitle(content);
+        try {
+          const updatedConversation = await updateConversation({
+            id: conversation._id,
+            title,
+          });
+          dispatch(
+            setConvTitle({
+              conversationId: conversation._id,
+              title: updatedConversation.title,
+            }),
+          );
+          conversation = updatedConversation;
+        } catch (error) {
+          console.error("Failed to update conversation title:", error);
+          dispatch(setConvTitle({ conversationId: conversation._id, title }));
+          conversation = { ...conversation, title };
+        }
       }
 
       setPrompt("");

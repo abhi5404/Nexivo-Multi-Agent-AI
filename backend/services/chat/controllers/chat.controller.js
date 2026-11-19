@@ -39,7 +39,24 @@ export const getConversation = async (req, res) => {
 export const updateConversation = async (req, res) => {
     try {
         const { id, title } = req.body;
-        const conversation = await Conversation.findByIdAndUpdate(id, { title }, { new: true });
+        const userId = req.headers["x-user-id"];
+        const normalizedTitle = typeof title === "string" ? title.trim() : "";
+
+        if (!id || !normalizedTitle) {
+            return res.status(400).json({ message: "id and title are required" });
+        }
+        if (!userId) {
+            return res.status(400).json({ message: "Missing user ID" });
+        }
+
+        const conversation = await Conversation.findOneAndUpdate(
+            { _id: id, userId },
+            { title: normalizedTitle.slice(0, 48) },
+            { new: true, runValidators: true }
+        );
+        if (!conversation) {
+            return res.status(404).json({ message: "Conversation not found" });
+        }
         res.status(200).json(conversation);
     } catch (error) {
         console.error("Error updating conversation:", error);
@@ -57,7 +74,8 @@ export const saveMessage = async (req, res) => {
             conversationId,
             role,
             content
-        })
+        });
+        await Conversation.findByIdAndUpdate(conversationId, { updatedAt: new Date() });
         res.status(201).json(message);
     } catch (error) {
         console.error("Error saving message:", error);
