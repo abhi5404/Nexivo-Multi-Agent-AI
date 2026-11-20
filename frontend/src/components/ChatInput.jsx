@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createConversation } from "../features/createConversation";
 import sendMessage from "../features/sendMessage";
+import { MessageSquare, Code2, Image, FileText, Presentation, Zap , Globe } from "lucide-react";
 import {
   addConversation,
   selectConversation,
@@ -18,7 +19,7 @@ function ChatInput() {
   );
   const [prompt, setPrompt] = useState("");
   const [isSending, setIsSending] = useState(false);
-
+  const [selectedAgent, setSelectedAgent] = useState("auto");
   const getConversationTitle = (text) => {
     const normalized = text.replace(/\s+/g, " ").trim();
     if (normalized.length <= 48) return normalized;
@@ -77,6 +78,7 @@ function ChatInput() {
       const data = await sendMessage({
         prompt: content,
         conversationId: conversation._id,
+        agent: selectedAgent,
       });
       console.log("AI response:", data?.response);
       if (data?.response) {
@@ -96,12 +98,77 @@ function ChatInput() {
     }
   };
 
+  const agents = [
+    {
+      id:"auto",
+      icon:Zap,
+      label:"Auto",
+    },
+    {
+      id:"chat",
+      icon:MessageSquare,
+      label:"Chat",
+    },
+    {
+      id : "coding",
+      icon:Code2,
+      label:"Coding",
+    },
+    {
+      id:"image",
+      icon:Image,
+      label:"Image",
+    },
+    {
+      id : "pdf",
+      icon:FileText,
+      label:"PDF",
+    },
+    {
+      id:"ppt",
+      icon:Presentation,
+      label:"PPT",
+    },
+    {
+      id:"search",
+      icon:Globe,
+      label:"Search",
+    },
+  ]
+
   return (
     <div className="w-full border-t border-white/[0.06] bg-[#0d0f14] px-4 pb-4 pt-3 md:px-6">
       <form
-        className="mx-auto flex max-w-3xl items-center gap-2 rounded-2xl border border-white/[0.1] bg-[#171a21] px-3 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.16)] transition-colors focus-within:border-indigo-400/30"
+        className="mx-auto flex max-w-3xl flex-col gap-2 rounded-2xl border border-white/[0.1] bg-[#171a21] px-3 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.16)] transition-colors focus-within:border-indigo-400/30"
         onSubmit={handleSendMessage}
       >
+        <div className="flex w-full gap-1 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {agents.map((agent) => {
+            const Icon = agent.icon;
+            const isActive = selectedAgent === agent.id;
+
+            return (
+              <button
+                key={agent.id}
+                type="button"
+                onClick={() => setSelectedAgent(agent.id)}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-medium transition-all duration-150 ${
+                  isActive
+                    ? "border border-indigo-400/20 bg-gradient-to-r from-indigo-500/20 to-violet-600/20 text-white shadow-[0_4px_14px_rgba(99,102,241,0.12)]"
+                    : "border border-transparent text-slate-500 hover:border-white/[0.06] hover:bg-white/[0.05] hover:text-slate-300"
+                }`}
+                title={`${agent.label} agent`}
+              >
+                <Icon
+                  size={14}
+                  className={isActive ? "text-indigo-300" : "text-slate-500"}
+                />
+                {agent.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex w-full items-center gap-2">
         <button
           type="button"
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-600 transition-all duration-150 hover:border-white/[0.06] hover:bg-white/[0.05] hover:text-slate-300"
@@ -136,6 +203,7 @@ function ChatInput() {
         >
           <Send size={16} strokeWidth={2} />
         </button>
+        </div>
       </form>
       <p className="mt-2 text-center text-[10px] text-slate-600">
         Nexivo can make mistakes. Check important information.

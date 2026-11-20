@@ -45,6 +45,17 @@ app.post("/api/auth/logout", async (req, res) => {
 });
 app.use("/api/auth", proxy(process.env.AUTH_SERVICE, {
   proxyReqPathResolver: (req) => req.originalUrl.replace(/^\/api\/auth/, "/auth"),
+  userResHeaderDecorator: (headers) => {
+    if (headers["set-cookie"]) {
+      const cookies = Array.isArray(headers["set-cookie"])
+        ? headers["set-cookie"]
+        : [headers["set-cookie"]];
+      headers["set-cookie"] = cookies.map((cookie) =>
+        cookie.includes("Path=") ? cookie : `${cookie}; Path=/`,
+      );
+    }
+    return headers;
+  },
 }));
 app.use("/api/chat", protect, proxyWithHeader(process.env.CHAT_SERVICE, "/api/chat"));
 

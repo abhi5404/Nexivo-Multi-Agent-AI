@@ -3,7 +3,7 @@ import { addMessage } from "../config/memory.js";
 
 export const agent = async (req, res) => {
     try {
-        const { prompt, conversationId } = req.body;
+        const { prompt, conversationId, agent: selectedAgent } = req.body;
         if (!prompt?.trim() || !conversationId) {
             return res.status(400).json({ message: "prompt and conversationId are required" });
         }
@@ -14,7 +14,8 @@ export const agent = async (req, res) => {
         })
         const result = await graph.invoke({
             prompt,
-            conversationId
+            conversationId,
+            agent: selectedAgent || "auto"
         })
         const response = result.aiResponse
         await addMessage(conversationId, "assistant", response);

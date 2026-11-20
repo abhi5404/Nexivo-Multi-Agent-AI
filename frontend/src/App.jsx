@@ -21,8 +21,8 @@ function App() {
 
       if (!profile) {
         const token = await firebaseUser.getIdToken();
-        await api.post("/api/auth/login", { token });
-        profile = await getCurrentUser();
+        const { data } = await api.post("/api/auth/login", { token });
+        profile = data.user;
       }
 
       dispatch(

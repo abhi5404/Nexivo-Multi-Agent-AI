@@ -1,6 +1,7 @@
 import { signInWithPopup, signOut } from "firebase/auth";
 import { auth, googleProvider } from "../../utils/firebase";
 import { useDispatch } from "react-redux";
+import { useRef } from "react";
 import logOut from "../features/logOut";
 import { setUserdata } from "../redux/userSlice";
 import SideBar from "../components/SideBar";
@@ -9,8 +10,12 @@ import Artifact from "../components/Artifact";
 
 function Home() {
   const dispatch = useDispatch();
+  const signingIn = useRef(false);
 
   const googleLogin = async () => {
+    if (signingIn.current) return;
+
+    signingIn.current = true;
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
@@ -18,6 +23,8 @@ function Home() {
         code: error.code,
         message: error.message,
       });
+    } finally {
+      signingIn.current = false;
     }
   };
 
