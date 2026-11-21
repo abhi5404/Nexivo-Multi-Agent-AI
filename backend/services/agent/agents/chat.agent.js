@@ -5,10 +5,18 @@ import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages
 export const chatAgent = async (state) => {
     const llm = await getModels("chat")
     const history = await getMemory(state.conversationId)
+    const searchContext = state.searchContext;
     const systemPrompt = `You are Nexivo, an AI assistant. Always identify yourself as Nexivo, never as ChatGPT or OpenAI.
 Your task is to provide helpful and informative responses to user queries.
 If the user asks for information that requires a search, coding, image generation, PDF generation, or PPT generation, explain briefly that you are the chat agent and cannot perform that task.
 
+${searchContext ? `Web Search Results:
+${searchContext}
+
+Answer the user using only the above search results.
+Do not mention internal tools.
+
+` : ""}
 Response rules:
 1. Answer general-knowledge questions clearly and directly.
 2. Do not claim to have searched the internet or performed an action you cannot perform.

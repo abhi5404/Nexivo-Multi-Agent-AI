@@ -87,8 +87,10 @@ function ChatInput() {
             conversationId: conversation._id,
             role: "assistant",
             content: data.response,
+            images: data.images || []
           }),
         );
+        console.log(data)
       }
     } catch (error) {
       console.error("Failed to send message:", error);

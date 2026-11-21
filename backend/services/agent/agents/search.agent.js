@@ -1,0 +1,23 @@
+import { searchTool } from "../config/tavily.js";
+
+export const searchAgent = async (state) => {
+  try {
+    const results = await searchTool.invoke({
+        query: state.prompt
+    })
+    console.log("Search results:", results);
+    return {
+        ...state,
+        searchResults: results,
+        searchContext: JSON.stringify(results),
+        images: results.images || []
+    };
+    } catch (error) {
+        return {
+            ...state,
+            searchResults: [],
+            searchContext: "",
+            images: [],
+        };
+  }
+};

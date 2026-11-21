@@ -9,7 +9,8 @@ const conversationSchema = new mongoose.Schema({
         type: String,
         enum: ["user", "assistant"],
     },
-    content: String
+    content: String,
+    images: [String]
 }, { timestamps: true });
 
 const Message = mongoose.model("Message", conversationSchema);

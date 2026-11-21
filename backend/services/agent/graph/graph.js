@@ -5,7 +5,7 @@ import { codingAgent } from "../agents/coding.agent.js";
 import { imageGenAgent } from "../agents/imageGen.agent.js";
 import { pdfAgent } from "../agents/pdf.agent.js";
 import { pptAgent } from "../agents/ppt.agent.js";
-import { searchAgent } from "../agents/serach.agent.js";
+import { searchAgent } from "../agents/search.agent.js";
 import { router } from "./router.js";
 
 const workflow = new StateGraph(agentState);
@@ -30,6 +30,6 @@ workflow.addEdge("coding", "__end__");
 workflow.addEdge("imageGen", "__end__");
 workflow.addEdge("pdf", "__end__");
 workflow.addEdge("ppt", "__end__");
-workflow.addEdge("search", "__end__");
+workflow.addEdge("search", "chat");
 
 export const graph = workflow.compile();
