@@ -74,7 +74,7 @@ export const saveMessage = async (req, res) => {
             conversationId,
             role,
             content,
-            images: []
+            images: Array.isArray(images) ? images : []
         });
         await Conversation.findByIdAndUpdate(conversationId, { updatedAt: new Date() });
         res.status(201).json(message);

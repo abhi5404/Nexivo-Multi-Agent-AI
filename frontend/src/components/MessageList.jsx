@@ -55,6 +55,7 @@ function MessageList() {
                 }
                 role={message.role}
                 content={message.content}
+                images={message.images || []}
               />
             );
           })}
