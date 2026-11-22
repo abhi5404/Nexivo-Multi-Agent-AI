@@ -1,6 +1,7 @@
 import axios from "axios";
 import { addMessage } from "../config/memory.js";
 
+
 export const agent = async (req, res) => {
     try {
         const { prompt, conversationId, agent: selectedAgent } = req.body;
@@ -17,17 +18,20 @@ export const agent = async (req, res) => {
             conversationId,
             agent: selectedAgent || "auto"
         })
-        const response = result.aiResponse
+        const response = String(result.aiResponse || "");
         await addMessage(conversationId, "assistant", response);
         await axios.post(`${process.env.CHAT_SERVICE}/save-message`, {
             conversationId,
             role: "assistant",
             content: response,
-            images: result.images || []
+            images: result.images || [],
+            artifacts: result.artifacts || []
         })
         return res.status(200).json({
             response: result.aiResponse,
-            images: result.images || []
+            images: result.images || [],
+            artifacts: result.artifacts || []
+
         });
     } catch (error) {
         console.error("Error in agent controller:", error);
