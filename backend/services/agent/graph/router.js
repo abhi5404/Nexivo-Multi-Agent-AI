@@ -20,6 +20,14 @@ export const router = async (state) => {
    const prompt = String(state.prompt || "").toLowerCase();
 
    if (
+      /\b(website|web site|webpage|landing page|portfolio|dashboard|clone|food delivery|e-commerce|ecommerce|shop|store|build a|make a)\b/.test(prompt)
+   ) {
+      return {
+         ...state,
+         agent: "coding",
+      };
+   }
+   if (
       /\b(code|coding|develop|debug|javascript|java|python|react|html|css|function|class|api|program|application)\b/.test(prompt)
    ) {
       return {

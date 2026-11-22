@@ -40,14 +40,24 @@ Use React / Next.js / Vue ONLY if explicitly requested.
 
 Rules:
 
-- Responsive
-- Modern UI
-- CSS Variables
-- Flexbox/Grid
-- Smooth Scroll
-- Hover Effects
-- Beautiful spacing
-- Single page unless user asks otherwise.
+- Build a polished, premium, production-quality interface.
+- Use a clear visual hierarchy with a strong headline, concise supporting copy, and one primary call to action.
+- Use a cohesive color system, generous spacing, restrained borders, subtle gradients, soft shadows, and consistent border radii.
+- Use CSS Variables for the design system and clamp() for fluid typography.
+- Use Flexbox/Grid, modern CSS, smooth scrolling, and polished hover/focus/active states.
+- Include tasteful entrance animations, staggered reveals, hover lift effects, shimmer/loading states, or scroll interactions.
+- Add micro-interactions: animated icons, button press feedback, image zoom, card depth, and subtle navigation transitions.
+- Respect prefers-reduced-motion and use semantic, keyboard-accessible HTML.
+- Make every section responsive across mobile, tablet, and desktop.
+- Use a fixed or sticky header only when it improves the experience.
+- Avoid generic dashboards and avoid repetitive card grids unless the request requires them.
+- Design for the complete page: header, hero, relevant content sections, social proof, CTA, and footer where appropriate.
+- Use professional, relevant remote images when the project needs visuals.
+- Prefer stable Unsplash URLs with explicit width and quality parameters, for example:
+  https://images.unsplash.com/photo-ID?auto=format&fit=crop&w=1600&q=85
+- Use working Unsplash photo URLs or another verified public CDN; never use broken, placeholder, or fake image URLs.
+- Use descriptive alt text and add loading="eager" for the main hero image and loading="lazy" for below-the-fold images.
+- Add onerror fallbacks to hide broken image icons or replace failed images with a styled gradient background.
 
 Return ONLY valid JSON.
 
@@ -94,6 +104,7 @@ ${state.prompt}
                     id: Date.now(),
                     type: "Project",
                     files: data.files || [],
+                    title: state.prompt || "Generated Project"
                 },
             ],
         };

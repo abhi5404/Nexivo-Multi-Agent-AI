@@ -10,7 +10,7 @@ import {
   setConvTitle,
 } from "../redux/conversationSlice";
 import { updateConversation } from "../features/updateConversations";
-import { addMessage } from "../redux/messageSlice";
+import { addMessage, setArtifacts } from "../redux/messageSlice";
 
 function ChatInput() {
   const dispatch = useDispatch();
@@ -90,6 +90,7 @@ function ChatInput() {
             images: data.images || []
           }),
         );
+        dispatch(setArtifacts(data.artifacts || []));
         console.log(data)
       }
     } catch (error) {

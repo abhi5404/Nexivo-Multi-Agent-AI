@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import getMessages from "../features/getMessages";
-import { setMessages } from "../redux/messageSlice";
+import { setMessages, setArtifacts } from "../redux/messageSlice";
 import Nav from "./Nav";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
@@ -53,6 +53,10 @@ function ChatArea() {
             new Date(left.createdAt || 0) - new Date(right.createdAt || 0),
         );
         dispatch(setMessages(mergedMessages));
+        const latestArtifactMessage = [...mergedMessages]
+          .reverse()
+          .find((message) => message.artifacts?.length);
+        dispatch(setArtifacts(latestArtifactMessage?.artifacts || []));
       }
     };
 
